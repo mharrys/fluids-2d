@@ -1,0 +1,26 @@
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  color: #ddd;
+  background: #fff;
+  background-color: #ddd;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+}
+
+#info {
+  font-size: 0.8em;
+  text-align: center;
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  padding: 5px;
+}
+
+a {
+  color: #888;
+}
