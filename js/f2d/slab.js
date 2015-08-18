@@ -24,7 +24,7 @@ var F2D = F2D === undefined ? {} : F2D;
         magFilter: THREE.NearestFilter,
         minFilter: THREE.NearestFilter,
         format: THREE.RGBAFormat,
-        type: THREE.HalfFloatType,
+        type: THREE.FloatType,
         depthBuffer: false,
         stencilBuffer: false,
         generateMipmaps: false,
