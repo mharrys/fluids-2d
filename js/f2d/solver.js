@@ -11,6 +11,7 @@ var F2D = F2D === undefined ? {} : F2D;
         this.velocity = slabs.velocity;
         this.density = slabs.density;
         this.velocityDivergence = slabs.velocityDivergence;
+        this.velocityVorticity = slabs.velocityVorticity;
         this.pressure = slabs.pressure;
 
         // slab operations
@@ -19,6 +20,10 @@ var F2D = F2D === undefined ? {} : F2D;
         this.jacobi = slabop.jacobi;
         this.gradient = slabop.gradient;
         this.splat = slabop.splat;
+        this.vorticity = slabop.vorticity;
+        this.vorticityConfinement = slabop.vorticityConfinement;
+
+        this.applyVorticity = false;
 
         // density color
         this.ink = new THREE.Vector3(0.0, 0.06, 0.19);
@@ -38,6 +43,16 @@ var F2D = F2D === undefined ? {} : F2D;
             this.advect.compute(renderer, this.velocity, this.density, this.density);
 
             this.addForces(renderer, mouse);
+            if (this.applyVorticity) {
+                this.vorticity.compute(renderer, this.velocity, this.velocityVorticity);
+                this.vorticityConfinement.compute(
+                    renderer,
+                    this.velocity,
+                    this.velocityVorticity,
+                    this.velocity
+                );
+            }
+
             this.project(renderer);
         },
 
@@ -99,7 +114,7 @@ var F2D = F2D === undefined ? {} : F2D;
         }
     };
 
-    F2D.Solver.make = function(grid, windowSize, shaders) {
+    F2D.Solver.make = function(grid, time, windowSize, shaders) {
         var w = grid.size.x,
             h = grid.size.y;
 
@@ -110,15 +125,18 @@ var F2D = F2D === undefined ? {} : F2D;
             density: F2D.Slab.make(w, h),
             // scalar
             velocityDivergence: F2D.Slab.make(w, h),
-            pressure: F2D.Slab.make(w, h)
+            velocityVorticity: F2D.Slab.make(w, h),
+            pressure: F2D.Slab.make(w, h),
         };
 
         var slabop = {
-            advect: new F2D.Advect(shaders.advect, grid),
+            advect: new F2D.Advect(shaders.advect, grid, time),
             divergence: new F2D.Divergence(shaders.divergence, grid),
             jacobi: new F2D.Jacobi(shaders.jacobi, grid),
             gradient: new F2D.Gradient(shaders.gradient, grid),
-            splat: new F2D.Splat(shaders.splat, grid)
+            splat: new F2D.Splat(shaders.splat, grid),
+            vorticity: new F2D.Vorticity(shaders.vorticity, grid),
+            vorticityConfinement: new F2D.VorticityConfinement(shaders.vorticityforce, grid, time)
         };
 
         return new F2D.Solver(grid, windowSize, slabs, slabop);
