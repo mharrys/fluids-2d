@@ -22,18 +22,18 @@
         size: new THREE.Vector2(512, 256),
         scale: 1
     };
-
+    var time = {
+        step: 1,
+    };
     var displayScalar, displayVector;
     var displaySettings = {
         slab: "density"
     };
-
     var solver, gui;
-
     var mouse = new F2D.Mouse(grid);
 
     function init(shaders) {
-        solver = F2D.Solver.make(grid, windowSize, shaders);
+        solver = F2D.Solver.make(grid, time, windowSize, shaders);
 
         displayScalar = new F2D.Display(shaders.basic, shaders.displayscalar);
         displayVector = new F2D.Display(shaders.basic, shaders.displayvector);
@@ -45,15 +45,19 @@
             "divergence",
             "pressure"
         ]);
+        gui.add(time, "step").min(0).step(0.01);
 
         var advectFolder = gui.addFolder("Advect");
-        advectFolder.add(solver.advect, "timestep").min(0).step(0.01);
         advectFolder.add(solver.advect, "dissipation", {
             "none": 1,
             "slow": 0.998,
             "fast": 0.992,
             "very fast": 0.9
         });
+
+        var vorticityFolder = gui.addFolder("Vorticity");
+        vorticityFolder.add(solver, "applyVorticity");
+        vorticityFolder.add(solver.vorticityConfinement, "curl").min(0).step(0.01);
 
         var jacobiFolder = gui.addFolder("Jacobi");
         jacobiFolder.add(solver.jacobi, "iterations", 0, 500, 1);
@@ -69,10 +73,10 @@
             ]
         };
         var splatFolder = gui.addFolder("Splat");
+        splatFolder.add(solver.splat, "radius").min(0);
         splatFolder.addColor(splatSettings, "color").onChange(function(value) {
             solver.ink.set(value[0] / 255, value[1] / 255, value[2] / 255);
         });
-        splatFolder.add(solver.splat, "radius").min(0);
 
         var gridFolder = gui.addFolder("Grid");
         gridFolder.add(grid, "scale");
@@ -131,7 +135,9 @@
         "displayscalar.fs",
         "displayvector.fs",
         "divergence.fs",
-        "splat.fs"
+        "splat.fs",
+        "vorticity.fs",
+        "vorticityforce.fs"
     ]);
     loader.run(function(files) {
         // remove file extension before passing shaders to init

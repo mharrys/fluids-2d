@@ -3,16 +3,17 @@ var F2D = F2D === undefined ? {} : F2D;
 (function(F2D) {
     "use strict";
 
-    F2D.Advect = function(fs, grid, time, dissipation) {
+    F2D.VorticityConfinement = function(fs, grid, time, epsilon, curl) {
         this.grid = grid;
         this.time = time;
-        this.dissipation = dissipation === undefined ? 0.998 : dissipation;
+        this.epsilon = epsilon === undefined ? 2.4414e-4 : epsilon;
+        this.curl = curl === undefined ? 0.03 : curl;
 
         this.uniforms = {
             velocity: {
                 type: "t"
             },
-            advected: {
+            vorticity: {
                 type: "t"
             },
             gridSize: {
@@ -24,24 +25,32 @@ var F2D = F2D === undefined ? {} : F2D;
             timestep: {
                 type: "f"
             },
-            dissipation: {
+            epsilon: {
                 type: "f"
-            }
+            },
+            curl: {
+                type: "v2",
+                value: new THREE.Vector2()
+            },
         };
 
         F2D.SlabopBase.call(this, fs, this.uniforms);
     };
 
-    F2D.Advect.prototype = Object.create(F2D.SlabopBase.prototype);
-    F2D.Advect.prototype.constructor = F2D.Advect;
+    F2D.VorticityConfinement.prototype = Object.create(F2D.SlabopBase.prototype);
+    F2D.VorticityConfinement.prototype.constructor = F2D.VorticityConfinement;
 
-    F2D.Advect.prototype.compute = function(renderer, velocity, advected, output) {
+    F2D.VorticityConfinement.prototype.compute = function(renderer, velocity, vorticity, output) {
         this.uniforms.velocity.value = velocity.read;
-        this.uniforms.advected.value = advected.read;
+        this.uniforms.vorticity.value = vorticity.read;
         this.uniforms.gridSize.value = this.grid.size;
         this.uniforms.gridScale.value = this.grid.scale;
         this.uniforms.timestep.value = this.time.step;
-        this.uniforms.dissipation.value = this.dissipation;
+        this.uniforms.epsilon.value = this.epsilon;
+        this.uniforms.curl.value.set(
+            this.curl * this.grid.scale,
+            this.curl * this.grid.scale
+        );
 
         renderer.render(this.scene, this.camera, output.write, false);
         output.swap();
