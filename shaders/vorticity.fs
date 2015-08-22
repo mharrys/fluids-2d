@@ -16,5 +16,5 @@ void main()
     float vt = texture2D(velocity, uv + yOffset).x;
 
     float scale = 0.5 / gridScale;
-    gl_FragColor = vec4(scale * (vr - vl - vt - vb), 0.0, 0.0, 1.0);
+    gl_FragColor = vec4(scale * (vr - vl - vt + vb), 0.0, 0.0, 1.0);
 }
