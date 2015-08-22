@@ -1,7 +1,7 @@
 uniform sampler2D read;
 
-uniform float bias;
-uniform float scale;
+uniform vec3 bias;
+uniform vec3 scale;
 
 varying vec2 texCoord;
 

@@ -99,22 +99,23 @@
         switch (displaySettings.slab) {
         case "velocity":
             display = displayVector;
-            display.scale = display.bias = 0.5;
+            display.scaleNegative();
             read = solver.velocity.read;
             break;
         case "density":
-            display = displayVector;
-            display.scale = 1.0; display.bias = 0.0;
+            display = displayScalar;
+            display.scale.copy(solver.ink);
+            display.bias.set(0, 0, 0);
             read = solver.density.read;
             break;
         case "divergence":
             display = displayScalar;
-            display.scale = display.bias = 0.5;
+            display.scaleNegative();
             read = solver.velocityDivergence.read;
             break;
         case "pressure":
             display = displayScalar;
-            display.scale = display.bias = 0.5;
+            display.scaleNegative();
             read = solver.pressure.read;
             break;
         }

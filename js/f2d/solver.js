@@ -25,7 +25,8 @@ var F2D = F2D === undefined ? {} : F2D;
 
         this.applyVorticity = false;
 
-        // density color
+        // density attributes
+        this.source = new THREE.Vector3(0.8, 0.0, 0.0);
         this.ink = new THREE.Vector3(0.0, 0.06, 0.19);
     };
 
@@ -87,7 +88,7 @@ var F2D = F2D === undefined ? {} : F2D;
                         this.splat.compute(
                             renderer,
                             this.density,
-                            this.ink,
+                            this.source,
                             point,
                             this.density
                         );

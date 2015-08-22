@@ -5,7 +5,7 @@ var F2D = F2D === undefined ? {} : F2D;
 
     F2D.Splat = function(fs, grid, radius) {
         this.grid = grid;
-        this.radius = radius === undefined ? grid.size.y * 0.02 : radius;
+        this.radius = radius === undefined ? grid.size.y * 0.03 : radius;
 
         this.uniforms = {
             read: {

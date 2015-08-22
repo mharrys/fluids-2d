@@ -4,18 +4,18 @@ var F2D = F2D === undefined ? {} : F2D;
     "use strict";
 
     F2D.Display = function(vs, fs, bias, scale) {
-        this.bias = bias === undefined ? 0 : bias;
-        this.scale = scale === undefined ? 1 : scale;
+        this.bias = bias === undefined ? new THREE.Vector3(0, 0, 0) : bias;
+        this.scale = scale === undefined ? new THREE.Vector3(1, 1, 1) : scale;
 
         this.uniforms = {
             read: {
                 type: "t"
             },
             bias: {
-                type: "f"
+                type: "v3"
             },
             scale: {
-                type: "f"
+                type: "v3"
             }
         };
         this.material = new THREE.ShaderMaterial({
@@ -35,6 +35,13 @@ var F2D = F2D === undefined ? {} : F2D;
 
     F2D.Display.prototype = {
         constructor: F2D.Display,
+
+        // set bias and scale for including range of negative values
+        scaleNegative: function() {
+            var v = 0.5;
+            this.bias.set(v, v, v);
+            this.scale.set(v, v, v);
+        },
 
         render: function(renderer, read) {
             this.uniforms.read.value = read;
