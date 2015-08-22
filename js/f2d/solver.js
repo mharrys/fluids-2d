@@ -122,9 +122,8 @@ var F2D = F2D === undefined ? {} : F2D;
         var slabs = {
             // vec2
             velocity: F2D.Slab.make(w, h),
-            // vec3
-            density: F2D.Slab.make(w, h),
             // scalar
+            density: F2D.Slab.make(w, h),
             velocityDivergence: F2D.Slab.make(w, h),
             velocityVorticity: F2D.Slab.make(w, h),
             pressure: F2D.Slab.make(w, h),
