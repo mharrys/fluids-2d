@@ -55,12 +55,16 @@
             "very fast": 0.9
         });
 
+        var viscosityFolder = gui.addFolder("Viscosity");
+        viscosityFolder.add(solver, "applyViscosity");
+        viscosityFolder.add(solver, "viscosity").min(0).step(0.01);
+
         var vorticityFolder = gui.addFolder("Vorticity");
         vorticityFolder.add(solver, "applyVorticity");
         vorticityFolder.add(solver.vorticityConfinement, "curl").min(0).step(0.01);
 
-        var jacobiFolder = gui.addFolder("Jacobi");
-        jacobiFolder.add(solver.jacobi, "iterations", 0, 500, 1);
+        var poissonPressureEqFolder = gui.addFolder("Poisson Pressure Equation");
+        poissonPressureEqFolder.add(solver.poissonPressureEq, "iterations", 0, 500, 1);
 
         // we need a splat color "adapter" since we want values between 0 and
         // 1 but also since dat.GUI requires a JavaScript array over a Three.js
@@ -132,7 +136,8 @@
         "advect.fs",
         "basic.vs",
         "gradient.fs",
-        "jacobi.fs",
+        "jacobiscalar.fs",
+        "jacobivector.fs",
         "displayscalar.fs",
         "displayvector.fs",
         "divergence.fs",
