@@ -3,8 +3,9 @@ var F2D = F2D === undefined ? {} : F2D;
 (function(F2D) {
     "use strict";
 
-    F2D.Solver = function(grid, windowSize, slabs, slabop) {
+    F2D.Solver = function(grid, time, windowSize, slabs, slabop) {
         this.grid = grid;
+        this.time = time;
         this.windowSize = windowSize;
 
         // slabs
@@ -16,13 +17,16 @@ var F2D = F2D === undefined ? {} : F2D;
 
         // slab operations
         this.advect = slabop.advect;
+        this.diffuse = slabop.diffuse;
         this.divergence = slabop.divergence;
-        this.jacobi = slabop.jacobi;
+        this.poissonPressureEq = slabop.poissonPressureEq;
         this.gradient = slabop.gradient;
         this.splat = slabop.splat;
         this.vorticity = slabop.vorticity;
         this.vorticityConfinement = slabop.vorticityConfinement;
 
+        this.viscosity = 0.3;
+        this.applyViscosity = false;
         this.applyVorticity = false;
 
         // density attributes
@@ -44,6 +48,7 @@ var F2D = F2D === undefined ? {} : F2D;
             this.advect.compute(renderer, this.velocity, this.density, this.density);
 
             this.addForces(renderer, mouse);
+
             if (this.applyVorticity) {
                 this.vorticity.compute(renderer, this.velocity, this.velocityVorticity);
                 this.vorticityConfinement.compute(
@@ -52,6 +57,13 @@ var F2D = F2D === undefined ? {} : F2D;
                     this.velocityVorticity,
                     this.velocity
                 );
+            }
+
+            if (this.applyViscosity && this.viscosity > 0) {
+                var s = this.grid.scale;
+                this.diffuse.alpha = (s * s) / (this.viscosity * this.time.step);
+                this.diffuse.beta = 4 + this.diffuse.alpha;
+                this.diffuse.compute(renderer, this.velocity, this.velocity, this.velocity);
             }
 
             this.project(renderer);
@@ -100,13 +112,29 @@ var F2D = F2D === undefined ? {} : F2D;
 
         // solve poisson equation and subtract pressure gradient
         project: function(renderer) {
-            this.divergence.compute(renderer, this.velocity, this.velocityDivergence);
+            this.divergence.compute(
+                renderer,
+                this.velocity,
+                this.velocityDivergence
+            );
 
             // 0 is our initial guess for the poisson equation solver
             this.clearSlab(renderer, this.pressure);
-            this.jacobi.compute(renderer, this.pressure, this.velocityDivergence, this.pressure);
 
-            this.gradient.compute(renderer, this.pressure, this.velocity, this.velocity);
+            this.poissonPressureEq.alpha = -this.grid.scale * this.grid.scale;
+            this.poissonPressureEq.compute(
+                renderer,
+                this.pressure,
+                this.velocityDivergence,
+                this.pressure
+            );
+
+            this.gradient.compute(
+                renderer,
+                this.pressure,
+                this.velocity,
+                this.velocity
+            );
         },
 
         clearSlab: function(renderer, slab) {
@@ -131,15 +159,16 @@ var F2D = F2D === undefined ? {} : F2D;
 
         var slabop = {
             advect: new F2D.Advect(shaders.advect, grid, time),
+            diffuse: new F2D.Jacobi(shaders.jacobivector, grid),
             divergence: new F2D.Divergence(shaders.divergence, grid),
-            jacobi: new F2D.Jacobi(shaders.jacobi, grid),
+            poissonPressureEq: new F2D.Jacobi(shaders.jacobiscalar, grid),
             gradient: new F2D.Gradient(shaders.gradient, grid),
             splat: new F2D.Splat(shaders.splat, grid),
             vorticity: new F2D.Vorticity(shaders.vorticity, grid),
             vorticityConfinement: new F2D.VorticityConfinement(shaders.vorticityforce, grid, time)
         };
 
-        return new F2D.Solver(grid, windowSize, slabs, slabop);
+        return new F2D.Solver(grid, time, windowSize, slabs, slabop);
     };
 
 }(F2D));

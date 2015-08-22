@@ -3,9 +3,11 @@ var F2D = F2D === undefined ? {} : F2D;
 (function(F2D) {
     "use strict";
 
-    F2D.Jacobi = function(fs, grid, iterations) {
+    F2D.Jacobi = function(fs, grid, iterations, alpha, beta) {
         this.grid = grid;
         this.iterations = iterations === undefined ? 50 : iterations;
+        this.alpha = alpha === undefined ? -1 : alpha;
+        this.beta = beta === undefined ? 4 : beta;
 
         this.uniforms = {
             x: {
@@ -41,8 +43,8 @@ var F2D = F2D === undefined ? {} : F2D;
         this.uniforms.x.value = x.read;
         this.uniforms.b.value = b.read;
         this.uniforms.gridSize.value = this.grid.size;
-        this.uniforms.alpha.value = -this.grid.scale * this.grid.scale;
-        this.uniforms.beta.value = 4;
+        this.uniforms.alpha.value = this.alpha;
+        this.uniforms.beta.value = this.beta;
 
         renderer.render(this.scene, this.camera, output.write, false);
         output.swap();
