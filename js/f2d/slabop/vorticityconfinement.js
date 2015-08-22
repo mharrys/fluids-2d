@@ -7,7 +7,7 @@ var F2D = F2D === undefined ? {} : F2D;
         this.grid = grid;
         this.time = time;
         this.epsilon = epsilon === undefined ? 2.4414e-4 : epsilon;
-        this.curl = curl === undefined ? 0.03 : curl;
+        this.curl = curl === undefined ? 0.3 : curl;
 
         this.uniforms = {
             velocity: {
