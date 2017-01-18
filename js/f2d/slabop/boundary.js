@@ -42,10 +42,15 @@ var F2D = F2D === undefined ? {} : F2D;
             return new THREE.Line(geometry, material);
         };
 
-        this.lineL = createLine([[-0.999, -1,     0], [-0.999, 1,     0]]);
-        this.lineR = createLine([[ 1,     -1,     0], [1,      1,     0]]);
-        this.lineB = createLine([[-1,     -0.999, 0], [1,     -0.999, 0]]);
-        this.lineT = createLine([[-1,      1,     0], [1,      1,     0]]);
+        var ax = (this.grid.size.x - 2) / this.grid.size.x;
+        var ay = (this.grid.size.y - 2) / this.grid.size.y;
+        var bx = (this.grid.size.x - 1) / this.grid.size.x;
+        var by = (this.grid.size.y - 1) / this.grid.size.y;
+
+        this.lineL = createLine([[-ax, -ay, 0], [-bx,  by, 0]]);
+        this.lineR = createLine([[ ax, -ay, 0], [ bx,  by, 0]]);
+        this.lineB = createLine([[-ax, -ay, 0], [ bx, -by, 0]]);
+        this.lineT = createLine([[-ax,  ay, 0], [ bx,  by, 0]]);
 
         this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
         this.scene = new THREE.Scene();
