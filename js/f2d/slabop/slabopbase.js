@@ -3,8 +3,8 @@ var F2D = F2D === undefined ? {} : F2D;
 (function(F2D) {
     "use strict";
 
-    F2D.SlabopBase = function(fs, uniforms) {
-        var geometry = new THREE.PlaneBufferGeometry(2, 2);
+    F2D.SlabopBase = function(fs, uniforms, grid) {
+        var geometry = new THREE.PlaneBufferGeometry(2 * (grid.size.x - 2) / grid.size.x, 2 * (grid.size.y - 2) / grid.size.y);
         var material = new THREE.ShaderMaterial({
             uniforms: uniforms,
             fragmentShader: fs,

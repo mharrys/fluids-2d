@@ -42,10 +42,10 @@ var F2D = F2D === undefined ? {} : F2D;
             return new THREE.Line(geometry, material);
         };
 
-        this.lineL = createLine([[-1, -1, 0], [-1,  1, 0]]);
-        this.lineR = createLine([[ 1, -1, 0], [ 1,  1, 0]]);
-        this.lineB = createLine([[-1, -1, 0], [ 1, -1, 0]]);
-        this.lineT = createLine([[-1,  1, 0], [ 1,  1, 0]]);
+        this.lineL = createLine([[-0.999, -1,     0], [-0.999, 1,     0]]);
+        this.lineR = createLine([[ 1,     -1,     0], [1,      1,     0]]);
+        this.lineB = createLine([[-1,     -0.999, 0], [1,     -0.999, 0]]);
+        this.lineT = createLine([[-1,      1,     0], [1,      1,     0]]);
 
         this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
         this.scene = new THREE.Scene();
@@ -57,6 +57,9 @@ var F2D = F2D === undefined ? {} : F2D;
         constructor: F2D.Boundary,
 
         compute: function(renderer, input, scale, output) {
+            if (!this.grid.applyBoundaries)
+                return;
+
             this.uniforms.read.value = input.read;
             this.uniforms.gridSize.value = this.grid.size;
             this.uniforms.scale.value = scale;

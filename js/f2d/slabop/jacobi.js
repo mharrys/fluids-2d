@@ -27,15 +27,16 @@ var F2D = F2D === undefined ? {} : F2D;
             },
         };
 
-        F2D.SlabopBase.call(this, fs, this.uniforms);
+        F2D.SlabopBase.call(this, fs, this.uniforms, grid);
     };
 
     F2D.Jacobi.prototype = Object.create(F2D.SlabopBase.prototype);
     F2D.Jacobi.prototype.constructor = F2D.Jacobi;
 
-    F2D.Jacobi.prototype.compute = function(renderer, x, b, output) {
+    F2D.Jacobi.prototype.compute = function(renderer, x, b, output, boundary, scale) {
         for (var i = 0; i < this.iterations; i++) {
             this.step(renderer, x, b, output);
+            boundary.compute(renderer, output, scale, output);
         }
     };
 

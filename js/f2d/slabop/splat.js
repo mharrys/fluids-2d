@@ -25,7 +25,7 @@ var F2D = F2D === undefined ? {} : F2D;
             }
         };
 
-        F2D.SlabopBase.call(this, fs, this.uniforms);
+        F2D.SlabopBase.call(this, fs, this.uniforms, grid);
     };
 
     F2D.Splat.prototype = Object.create(F2D.SlabopBase.prototype);
