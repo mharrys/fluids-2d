@@ -143,7 +143,8 @@
         "divergence.fs",
         "splat.fs",
         "vorticity.fs",
-        "vorticityforce.fs"
+        "vorticityforce.fs",
+        "boundary.fs"
     ]);
     loader.run(function(files) {
         // remove file extension before passing shaders to init

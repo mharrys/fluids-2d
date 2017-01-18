@@ -24,6 +24,7 @@ var F2D = F2D === undefined ? {} : F2D;
         this.splat = slabop.splat;
         this.vorticity = slabop.vorticity;
         this.vorticityConfinement = slabop.vorticityConfinement;
+        this.boundary = slabop.boundary;
 
         this.viscosity = 0.3;
         this.applyViscosity = false;
@@ -43,6 +44,7 @@ var F2D = F2D === undefined ? {} : F2D;
             var temp = this.advect.dissipation;
             this.advect.dissipation = 1;
             this.advect.compute(renderer, this.velocity, this.velocity, this.velocity);
+            this.boundary.compute(renderer, this.velocity, -1, this.velocity);
 
             this.advect.dissipation = temp;
             this.advect.compute(renderer, this.velocity, this.density, this.density);
@@ -57,13 +59,15 @@ var F2D = F2D === undefined ? {} : F2D;
                     this.velocityVorticity,
                     this.velocity
                 );
+                this.boundary.compute(renderer, this.velocity, -1, this.velocity);
             }
 
             if (this.applyViscosity && this.viscosity > 0) {
                 var s = this.grid.scale;
+
                 this.diffuse.alpha = (s * s) / (this.viscosity * this.time.step);
                 this.diffuse.beta = 4 + this.diffuse.alpha;
-                this.diffuse.compute(renderer, this.velocity, this.velocity, this.velocity);
+                this.diffuse.compute(renderer, this.velocity, this.velocity, this.velocity, this.boundary, -1);
             }
 
             this.project(renderer);
@@ -94,6 +98,7 @@ var F2D = F2D === undefined ? {} : F2D;
                             point,
                             this.velocity
                         );
+                        this.boundary.compute(renderer, this.velocity, -1, this.velocity);
                     }
 
                     if (motion.right) {
@@ -126,7 +131,9 @@ var F2D = F2D === undefined ? {} : F2D;
                 renderer,
                 this.pressure,
                 this.velocityDivergence,
-                this.pressure
+                this.pressure,
+                this.boundary,
+                1
             );
 
             this.gradient.compute(
@@ -135,6 +142,7 @@ var F2D = F2D === undefined ? {} : F2D;
                 this.velocity,
                 this.velocity
             );
+            this.boundary.compute(renderer, this.velocity, -1, this.velocity);
         },
 
         clearSlab: function(renderer, slab) {
@@ -165,7 +173,8 @@ var F2D = F2D === undefined ? {} : F2D;
             gradient: new F2D.Gradient(shaders.gradient, grid),
             splat: new F2D.Splat(shaders.splat, grid),
             vorticity: new F2D.Vorticity(shaders.vorticity, grid),
-            vorticityConfinement: new F2D.VorticityConfinement(shaders.vorticityforce, grid, time)
+            vorticityConfinement: new F2D.VorticityConfinement(shaders.vorticityforce, grid, time),
+            boundary: new F2D.Boundary(shaders.boundary, grid)
         };
 
         return new F2D.Solver(grid, time, windowSize, slabs, slabop);
