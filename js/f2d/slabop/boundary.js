@@ -57,6 +57,9 @@ var F2D = F2D === undefined ? {} : F2D;
         constructor: F2D.Boundary,
 
         compute: function(renderer, input, scale, output) {
+            if (!this.grid.applyBoundaries)
+                return;
+
             this.uniforms.read.value = input.read;
             this.uniforms.gridSize.value = this.grid.size;
             this.uniforms.scale.value = scale;

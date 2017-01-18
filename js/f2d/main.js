@@ -20,7 +20,8 @@
 
     var grid = {
         size: new THREE.Vector2(512, 256),
-        scale: 1
+        scale: 1,
+        applyBoundaries: true
     };
     var time = {
         step: 1,
@@ -83,6 +84,7 @@
         });
 
         var gridFolder = gui.addFolder("Grid");
+        gridFolder.add(grid, "applyBoundaries");
         gridFolder.add(grid, "scale");
 
         requestAnimationFrame(update);
